@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">Mav Yaks</string>
+    <string name="action_settings">Settings</string>
+
+
+
+    <string name="label_welcome_login">Login to Mav Yak</string>
+    <string name="label_welcome_register">Sign up for Mav Yak</string>
+    <string name="label_name">Name</string>
+    <string name="label_email">Email</string>
+    <string name="label_password">Password</string>
+    <string name="label_password_confirm">Confirm Password</string>
+    <string name="label_login">Login</string>
+    <string name="label_register">Register</string>
+    <string name="label_sign_up">No account? Register</string>
+</resources>
