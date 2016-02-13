@@ -52,6 +52,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         * we just need to give reference to the
         * buttons
         * */
+
+        ///ahange
         btnLogin.setOnClickListener(this);
         btnRegister.setOnClickListener(this);
     }
