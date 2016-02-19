@@ -53,6 +53,18 @@ public class YakAdapter extends RecyclerView.Adapter<YakAdapter.YakHolder> {
         notifyItemInserted(yaks.size() - 1);
     }
 
+    /*
+     * In order to get the behavior we wanted we needed to
+     * use employ polymorphism and add a location argument
+     * to the addYak class so that we can have the yak be added
+     * to the top of the list.
+     */
+    public void addYak(Yak yak, int location)
+    {
+        yaks.add(location, yak);
+        notifyItemInserted(location);
+    }
+
     public void removeYak(int index) {
         yaks.remove(index);
         notifyItemRemoved(index);

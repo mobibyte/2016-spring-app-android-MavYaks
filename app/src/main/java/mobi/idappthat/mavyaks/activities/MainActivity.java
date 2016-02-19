@@ -1,5 +1,7 @@
 package mobi.idappthat.mavyaks.activities;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -21,6 +23,8 @@ import mobi.idappthat.mavyaks.models.Yak;
 
 public class MainActivity extends AppCompatActivity {
 
+    //Just a constant to represent our post activity
+    private static final int CREATE_POST_REQUEST = 1;
 
     /*
     * Adapter and Recycler view are member variables
@@ -28,20 +32,27 @@ public class MainActivity extends AppCompatActivity {
     * */
     YakAdapter adapter;
     RecyclerView list;
+    Context mContext;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        mContext = this;
+
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+            public void onClick(View view)
+            {
+                //Here we start the start the CreatePostActivity and wait for its result
+                Intent i = new Intent(getApplicationContext(), CreatePostActivity.class);
+                startActivityForResult(i, CREATE_POST_REQUEST);
             }
         });
 
@@ -113,5 +124,31 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    /*
+     * Here we override the method so that we can be notified
+     * when the Activity calls back with a Yak.
+     */
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if(requestCode == CREATE_POST_REQUEST)
+        {
+            if(resultCode == RESULT_OK)
+            {
+                //We can get our data from the intent like so.
+                String post = data.getStringExtra(CreatePostActivity.TEXT);
+                //Create a new user for our post ie ME!!!
+                User user = new User("Me");
+                //Create the new Yak with our data the date.
+                Yak yak = new Yak(user, post, new Date());
+                //Add the yak to the top!
+                adapter.addYak(yak, 0);
+
+            }
+        }
     }
 }

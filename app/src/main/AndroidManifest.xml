@@ -9,8 +9,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
-        <activity
-            android:name=".activities.LoginActivity">
+        <activity android:name=".activities.LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -19,15 +18,21 @@
         </activity>
 
         <activity
-            android:theme="@style/AppTheme.NoActionBar"
             android:name=".activities.MainActivity"
-            android:label="@string/app_name" />
+            android:label="@string/app_name"
+            android:theme="@style/AppTheme.NoActionBar" />
 
         <activity
             android:name=".activities.SignUpActivity"
             android:label="@string/label_register"
             android:parentActivityName=".activities.LoginActivity" />
 
+        <activity
+            android:name=".activities.CreatePostActivity"
+            android:label="@string/title_activity_create_post"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:parentActivityName=".activities.MainActivity"
+            android:windowSoftInputMode="adjustResize" />
     </application>
 
 </manifest>
