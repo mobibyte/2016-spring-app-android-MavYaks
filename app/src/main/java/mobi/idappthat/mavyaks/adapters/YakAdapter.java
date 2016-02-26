@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Locale;
 
 import mobi.idappthat.mavyaks.R;
+import mobi.idappthat.mavyaks.models.DataYak;
 import mobi.idappthat.mavyaks.models.Yak;
 
 /**
@@ -35,7 +36,12 @@ public class YakAdapter extends RecyclerView.Adapter<YakAdapter.YakHolder> {
     * formatter object EVERY time
     * */
 
-    List<Yak> yaks;
+    /*
+    * EDIT: Part 4
+    * Yak was changed to DataYak for Firebase
+    * */
+
+    List<DataYak> yaks;
     SimpleDateFormat dateFormat;
 
     public YakAdapter() {
@@ -48,7 +54,7 @@ public class YakAdapter extends RecyclerView.Adapter<YakAdapter.YakHolder> {
     * We then notify that the data has been changed on the last
     * element of the list.
     * */
-    public void addYak(Yak yak) {
+    public void addYak(DataYak yak) {
         yaks.add(yak);
         notifyItemInserted(yaks.size() - 1);
     }
@@ -59,7 +65,7 @@ public class YakAdapter extends RecyclerView.Adapter<YakAdapter.YakHolder> {
      * to the addYak class so that we can have the yak be added
      * to the top of the list.
      */
-    public void addYak(Yak yak, int location)
+    public void addYak(DataYak yak, int location)
     {
         yaks.add(location, yak);
         notifyItemInserted(location);
@@ -92,7 +98,7 @@ public class YakAdapter extends RecyclerView.Adapter<YakAdapter.YakHolder> {
 
     @Override
     public void onBindViewHolder(YakHolder holder, int position) {
-        Yak yak = yaks.get(position);
+        DataYak yak = yaks.get(position);
         holder.bind(yak, dateFormat);
     }
 
@@ -106,6 +112,9 @@ public class YakAdapter extends RecyclerView.Adapter<YakAdapter.YakHolder> {
     * A ViewHolder is each cell or list item.
     * it holds and inflates every element which can
     * be bind to a "Yak"
+    *
+    * Edit: Part 4
+    * Yak has been changed to DataYak
     * */
     public class YakHolder extends RecyclerView.ViewHolder {
 
@@ -127,9 +136,9 @@ public class YakAdapter extends RecyclerView.Adapter<YakAdapter.YakHolder> {
             ibStar = (ImageButton) itemView.findViewById(R.id.ib_star);
         }
 
-        public void bind(Yak yak, SimpleDateFormat dateFormat) {
-            tvYak.setText(yak.getTweet());
-            tvUser.setText(yak.getUser().getName());
+        public void bind(DataYak yak, SimpleDateFormat dateFormat) {
+            tvYak.setText(yak.getText());
+            tvUser.setText(yak.getUser());
             tvDate.setText(dateFormat.format(yak.getCreatedAt()));
         }
     }

@@ -1,25 +1,31 @@
 package mobi.idappthat.mavyaks.activities;
 
+import android.accounts.Account;
+import android.accounts.AccountManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.view.View;
+import android.util.Patterns;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+
+import com.firebase.client.ChildEventListener;
+import com.firebase.client.DataSnapshot;
+import com.firebase.client.Firebase;
+import com.firebase.client.FirebaseError;
 
 import java.util.Calendar;
-import java.util.Date;
+import java.util.regex.Pattern;
 
 import mobi.idappthat.mavyaks.R;
 import mobi.idappthat.mavyaks.adapters.YakAdapter;
-import mobi.idappthat.mavyaks.models.User;
-import mobi.idappthat.mavyaks.models.Yak;
+import mobi.idappthat.mavyaks.models.DataYak;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -33,6 +39,13 @@ public class MainActivity extends AppCompatActivity {
     YakAdapter adapter;
     RecyclerView list;
     Context mContext;
+
+    /*
+    * This is the object we use to reference the tweets
+    * or yaks in our Firebase database. This is real time
+    * data so we can keep retrieving them and it will
+    * live update*/
+    Firebase yaksRef;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,15 +61,12 @@ public class MainActivity extends AppCompatActivity {
 
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view)
-            {
+            public void onClick(View view) {
                 //Here we start the start the CreatePostActivity and wait for its result
                 Intent i = new Intent(getApplicationContext(), CreatePostActivity.class);
                 startActivityForResult(i, CREATE_POST_REQUEST);
             }
         });
-
-
 
         /*
         * Time to setup the RecyclerView!
@@ -74,8 +84,65 @@ public class MainActivity extends AppCompatActivity {
         list.setLayoutManager(lm);
         list.setAdapter(adapter);
 
-        //Add some fake tweets!
-        addFakeTweets();
+        /*
+        * Setup the reference to Firebase. Put in your
+        * App url from firebase then call the child of your
+        * array, ours is called "yaks"
+        *
+        * We don't really need to worry about anything except
+        * onChildAdded. You can check for deletion on your own!
+        * */
+        yaksRef = new Firebase("https://mav-yaks.firebaseio.com");
+        yaksRef.child("yaks").addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                DataYak yak = dataSnapshot.getValue(DataYak.class);
+                adapter.addYak(yak, 0);
+                list.scrollToPosition(0);
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(FirebaseError firebaseError) {
+
+            }
+        });
+    }
+
+    /*
+    * This is just a cool snippet you might find useful in your
+    * android dev spiritual journey
+    *
+    * It just gets the default user account, remember to add
+    * the permission!
+    *
+    * http://stackoverflow.com/questions/2112965/how-to-get-the-android-devices-primary-e-mail-address
+    * */
+    private String getUserAccount() {
+        Pattern emailPattern = Patterns.EMAIL_ADDRESS; // API level 8+
+        Account[] accounts = AccountManager.get(mContext).getAccounts();
+
+        for(Account account : accounts) {
+            if(emailPattern.matcher(account.name).matches()) {
+                return account.name;
+            }
+        }
+
+        return "Secret User";
     }
 
 
@@ -87,7 +154,12 @@ public class MainActivity extends AppCompatActivity {
     *
     * Remember to add each tweet to the adapter!
     * */
-    private void addFakeTweets() {
+
+    /*
+    * EDIT: Part 4, this is no longer needed since
+    * We have firebase and DataYak
+    * */
+    /*private void addFakeTweets() {
         Calendar c = Calendar.getInstance();
 
         User u1 = new User("Fred Fred");
@@ -102,7 +174,7 @@ public class MainActivity extends AppCompatActivity {
         adapter.addYak(yak2);
         adapter.addYak(yak3);
         adapter.addYak(yak4);
-    }
+    }*/
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -139,15 +211,28 @@ public class MainActivity extends AppCompatActivity {
         {
             if(resultCode == RESULT_OK)
             {
-                //We can get our data from the intent like so.
-                String post = data.getStringExtra(CreatePostActivity.TEXT);
-                //Create a new user for our post ie ME!!!
-                User user = new User("Me");
-                //Create the new Yak with our data the date.
-                Yak yak = new Yak(user, post, new Date());
-                //Add the yak to the top!
-                adapter.addYak(yak, 0);
+                /*
+                * First of all, we need the current time in millis.
+                * We next need to get the data they just set as
+                * the "result". We made a public static final string
+                * just incase it ever changes
+                *
+                * We then send off the data to firebase!!
+                *
+                * Remember to use "push" if its an array
+                *
+                *
+                * EDIT: part 4
+                * We no longer need to add to the adapter since
+                * "OnChildAdded" does that for us! thanks firebase
+                * */
 
+                Calendar c = Calendar.getInstance();
+                String post = data.getStringExtra(CreatePostActivity.TEXT);
+                String user = getUserAccount();
+
+                DataYak yak = new DataYak(user, post, c.getTimeInMillis());
+                yaksRef.child("yaks").push().setValue(yak);
             }
         }
     }
