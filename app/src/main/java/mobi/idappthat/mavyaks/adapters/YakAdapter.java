@@ -76,6 +76,11 @@ public class YakAdapter extends RecyclerView.Adapter<YakAdapter.YakHolder> {
         notifyItemRemoved(index);
     }
 
+    public void removeYak(DataYak yak) {
+        int index = yaks.indexOf(yak);
+        removeYak(index);
+    }
+
 
     /*
     * These next few methods are needed whenever you

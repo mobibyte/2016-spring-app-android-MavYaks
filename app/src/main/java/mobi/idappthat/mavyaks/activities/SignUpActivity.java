@@ -1,18 +1,25 @@
 package mobi.idappthat.mavyaks.activities;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
 import mobi.idappthat.mavyaks.R;
+import mobi.idappthat.mavyaks.util.AuthCallback;
+import mobi.idappthat.mavyaks.util.AuthHelper;
 
 /**
  * Created by Cameron on 2/4/16.
  */
 public class SignUpActivity extends AppCompatActivity {
+
+    ViewGroup baseView;
 
     EditText etName, etEmail, etPass, etConfirmPass;
     Button btnRegister;
@@ -21,6 +28,16 @@ public class SignUpActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_signup);
+
+        /*
+        * Get the base view
+        * This is another one of those cool tricks
+        * to just kind of save
+        *
+        * This base view will be used to show the
+        * "Snackbar" at the bottom of the screen
+        * */
+        baseView = (ViewGroup) ((ViewGroup) this.findViewById(android.R.id.content)).getChildAt(0);
 
         //Setup widgets
         btnRegister = (Button) findViewById(R.id.btn_register);
@@ -52,8 +69,79 @@ public class SignUpActivity extends AppCompatActivity {
     * the tell it a length, but remember to say show!
     * */
     private void register() {
-        //Basic way to get input from a EditText
-        String name = etName.getText().toString();
-        Toast.makeText(this, "Hello, " + name, Toast.LENGTH_SHORT).show();
+
+        /*
+        * Now we want to make sure the form is valid
+        * See the function below for more details
+        * */
+        if(formIsValid()) {
+            //Get all the inputs
+            String name = etName.getText().toString();
+            String email = etEmail.getText().toString();
+            String pass = etPass.getText().toString();
+
+            //Later you can make a loading bar instead!
+            btnRegister.setEnabled(false);
+
+
+            //User our login helper to login
+            AuthHelper.registerNewUser(name, email, pass, new AuthCallback() {
+                @Override
+                public void onSuccess() {
+                    finishLogin();
+                }
+
+                @Override
+                public void onError(String message) {
+                    Snackbar.make(baseView, message, Snackbar.LENGTH_SHORT).show();
+                    btnRegister.setEnabled(true);
+                }
+            });
+        }
+    }
+
+    //Just like before, clear the stack and goto MainActivity
+    private void finishLogin() {
+        Intent loginIntent = new Intent(this, MainActivity.class);
+        loginIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(loginIntent);
+    }
+
+    //Helper function for the form
+    private boolean formIsValid() {
+        //We add all the EditTexts so we can loop though them
+        EditText forms[] = { etName, etEmail, etPass, etConfirmPass };
+        boolean valid = true;
+
+        /*
+        * We could always just return when we find
+        * a form not filled out, but in our case
+        * we want each field to say if it has
+        * the proper data needed
+        * */
+        for(EditText et : forms) {
+            if(et.getText().toString().isEmpty()) {
+                et.setError("Form Required");
+
+                valid = false;
+            }
+        }
+
+        //Premature return for required forms
+        if(!valid) {
+            Snackbar.make(baseView, "All forms required", Snackbar.LENGTH_SHORT).show();
+            return false;
+        }
+
+        //Make sure passwords are equal
+        if(!etPass.getText().toString().equals(etConfirmPass.getText().toString())) {
+            etPass.setError("Passwords must match");
+            etConfirmPass.setError("Passwords must match");
+
+            Snackbar.make(baseView, "Passwords must match", Snackbar.LENGTH_SHORT).show();
+            return false;
+        }
+
+        return true;
     }
 }

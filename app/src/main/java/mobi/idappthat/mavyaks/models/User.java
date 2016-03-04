@@ -11,12 +11,12 @@ public class User {
     * profile data
     * */
 
+    String id;
     String name;
     String email;
     String pictureUrl;
 
-    public User(String name) {
-        this.name = name;
+    public User() {
     }
 
     public User(String name, String email, String pictureUrl) {
@@ -35,5 +35,21 @@ public class User {
 
     public String getPictureUrl() {
         return pictureUrl;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public void setPictureUrl(String pictureUrl) {
+        this.pictureUrl = pictureUrl;
     }
 }

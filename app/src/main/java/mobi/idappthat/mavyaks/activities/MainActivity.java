@@ -108,7 +108,8 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onChildRemoved(DataSnapshot dataSnapshot) {
-
+                DataYak yak = dataSnapshot.getValue(DataYak.class);
+                adapter.removeYak(yak);
             }
 
             @Override
