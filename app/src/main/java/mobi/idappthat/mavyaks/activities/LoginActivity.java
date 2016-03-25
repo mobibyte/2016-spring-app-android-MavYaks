@@ -1,6 +1,7 @@
 package mobi.idappthat.mavyaks.activities;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -8,6 +9,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+
+import com.firebase.client.AuthData;
 
 import mobi.idappthat.mavyaks.R;
 import mobi.idappthat.mavyaks.util.AuthCallback;
@@ -110,7 +113,13 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         //Use our special login helper to login with the email and pass
         AuthHelper.login(email, password, new AuthCallback() {
             @Override
-            public void onSuccess() {
+            public void onSuccess(AuthData authData) {
+                //Create our shared prefs instance
+                SharedPreferences.Editor prefs = getSharedPreferences("MavYak", MODE_PRIVATE).edit();
+
+                //Save our UUID for later and commit it synchronously
+                prefs.putString("uuid", authData.getUid()).commit();
+
                 finishLogin();
             }
 

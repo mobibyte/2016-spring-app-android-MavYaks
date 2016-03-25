@@ -1,5 +1,6 @@
 package mobi.idappthat.mavyaks.util;
 
+import android.content.SharedPreferences;
 import android.util.Log;
 
 import com.firebase.client.AuthData;
@@ -44,7 +45,11 @@ public class AuthHelper {
                 //Save data to Firebase
                 String uid = result.get("uid").toString();
 
+
+                //Make sure our user object is created
                 User user = new User();
+
+                //Set our values for the user
                 user.setId(uid);
                 user.setEmail(email);
                 user.setName(name);
@@ -76,8 +81,9 @@ public class AuthHelper {
         ref.authWithPassword(email, password, new Firebase.AuthResultHandler() {
             @Override
             public void onAuthenticated(AuthData authData) {
+
                 Log.d(TAG, "Logged in " + authData.toString());
-                callback.onSuccess();
+                callback.onSuccess(authData);
             }
 
             @Override

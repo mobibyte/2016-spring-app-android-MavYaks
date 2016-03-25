@@ -4,6 +4,7 @@ import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
@@ -19,6 +20,7 @@ import com.firebase.client.ChildEventListener;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
+import com.firebase.client.ValueEventListener;
 
 import java.util.Calendar;
 import java.util.regex.Pattern;
@@ -26,11 +28,14 @@ import java.util.regex.Pattern;
 import mobi.idappthat.mavyaks.R;
 import mobi.idappthat.mavyaks.adapters.YakAdapter;
 import mobi.idappthat.mavyaks.models.DataYak;
+import mobi.idappthat.mavyaks.models.User;
 
 public class MainActivity extends AppCompatActivity {
 
     //Just a constant to represent our post activity
     private static final int CREATE_POST_REQUEST = 1;
+
+
 
     /*
     * Adapter and Recycler view are member variables
@@ -142,7 +147,6 @@ public class MainActivity extends AppCompatActivity {
                 return account.name;
             }
         }
-
         return "Secret User";
     }
 
@@ -204,7 +208,7 @@ public class MainActivity extends AppCompatActivity {
      * when the Activity calls back with a Yak.
      */
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data)
+    protected void onActivityResult(int requestCode, int resultCode, final Intent data)
     {
         super.onActivityResult(requestCode, resultCode, data);
 
@@ -228,12 +232,31 @@ public class MainActivity extends AppCompatActivity {
                 * "OnChildAdded" does that for us! thanks firebase
                 * */
 
-                Calendar c = Calendar.getInstance();
-                String post = data.getStringExtra(CreatePostActivity.TEXT);
-                String user = getUserAccount();
+                final Calendar c = Calendar.getInstance();
+                final String post = data.getStringExtra(CreatePostActivity.TEXT);
+//                String user = getUserAccount();
 
-                DataYak yak = new DataYak(user, post, c.getTimeInMillis());
-                yaksRef.child("yaks").push().setValue(yak);
+                //Get the prefs we made earlier
+                SharedPreferences prefs = getSharedPreferences("MavYak", MODE_PRIVATE);
+                //Get our UUID from the store
+                String uuid = prefs.getString("uuid", "");
+
+                //Now that we have the save UUID we can get our Users data from Firebase.
+                yaksRef.child("users/" + uuid).addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        //Fill in our model
+                        User user = dataSnapshot.getValue(User.class);
+                        String name = user.getName();
+
+                        //Create our yak with the user data
+                        DataYak yak = new DataYak(name, post, c.getTimeInMillis());
+                        yaksRef.child("yaks").push().setValue(yak);
+                    }
+
+                    @Override
+                    public void onCancelled(FirebaseError firebaseError) {}
+                });
             }
         }
     }

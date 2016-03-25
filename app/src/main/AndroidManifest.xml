@@ -1,12 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="mobi.idappthat.mavyaks">
-
+    package="mobi.idappthat.mavyaks" >
 
     <!-- Add your permissions here! -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
-
 
     <!-- Make sure to create the new Application class! -->
     <application
@@ -15,31 +13,27 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
-
-        <activity android:name=".activities.LoginActivity">
+        android:theme="@style/AppTheme" >
+        <activity android:name=".activities.LoginActivity" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".activities.MainActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar" />
-
         <activity
             android:name=".activities.SignUpActivity"
             android:label="@string/label_register"
             android:parentActivityName=".activities.LoginActivity" />
-
         <activity
             android:name=".activities.CreatePostActivity"
             android:label="@string/title_activity_create_post"
-            android:theme="@style/AppTheme.NoActionBar"
             android:parentActivityName=".activities.MainActivity"
+            android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="adjustResize" />
     </application>
 

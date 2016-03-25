@@ -83,8 +83,7 @@ public class CreatePostActivity extends AppCompatActivity
      * so that we can add it to the adapter in the main activity
      * and even send it to the server.
      */
-    private void sendPost()
-    {
+    private void sendPost() {
         Intent data = new Intent();
         data.putExtra(TEXT, mText.getText().toString());
         setResult(RESULT_OK, data);
